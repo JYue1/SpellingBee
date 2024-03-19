@@ -1,0 +1,12 @@
+a
+ab
+
+a
+ac
+b
+
+bc
+c
+ca
+
+cb

@@ -1,4 +1,6 @@
+// James Yue
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -22,7 +24,7 @@ import java.util.Scanner;
  * It utilizes recursion to generate the strings, mergesort to sort them, and
  * binary search to find them in a dictionary.
  *
- * @author Zach Blick, [ADD YOUR NAME HERE]
+ * @author Zach Blick, James Yue
  *
  * Written on March 5, 2023 for CS2 @ Menlo School
  *
@@ -44,13 +46,58 @@ public class SpellingBee {
     //  Store them all in the ArrayList words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void generate() {
-        // YOUR CODE HERE — Call your recursive method!
+        makeWords("", letters);
+    }
+
+    public void makeWords(String holder, String letters) {
+        if (letters.length() == 0) {
+            words.add(letters);
+        }
+        for (int i = 0; i < letters.length(); i++) {
+            words.add(holder);
+            makeWords(holder + letters.substring(i, i + 1), letters.substring(0, i) + letters.substring(i + 1));
+        }
     }
 
     // TODO: Apply mergesort to sort all words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void sort() {
-        // YOUR CODE HERE
+        // Call on the function merge
+        mergeSort(words, 0, words.size() - 1);
+    }
+
+    private ArrayList<String> mergeSort(ArrayList<String> arr, int low, int high) {
+        if (high - low == 0) {
+            ArrayList<String> newArr = new ArrayList<String>();
+            newArr.add(arr.get(low));
+            return newArr;
+        }
+        int med = (high + low) / 2;
+        ArrayList<String> arr1 = mergeSort(arr, low, med);
+        ArrayList<String> arr2 = mergeSort(arr, med + 1, high);
+        return merge(arr1, arr2);
+    }
+
+    public ArrayList<String> merge(ArrayList<String> arr1, ArrayList<String> arr2) {
+
+        ArrayList<String> sol = new ArrayList<String>();
+        int index1 = 0, index2 = 0;
+
+        while (index1 < arr1.size() && index2 < arr2.size()) {
+            if (arr1.get(index1).compareTo(arr2.get(index2)) < 0) {
+                sol.add(arr1.get(index1++));
+            }
+            else {
+                sol.add(arr2.get(index2++));
+            }
+        }
+        while (index1 < arr1.size()) {
+            sol.add(arr1.get(index1++));
+        }
+        while (index2 < arr2.size()) {
+            sol.add(arr2.get(index2++));
+        }
+        return sol;
     }
 
     // Removes duplicates from the sorted list.
@@ -68,8 +115,39 @@ public class SpellingBee {
     // TODO: For each word in words, use binary search to see if it is in the dictionary.
     //  If it is not in the dictionary, remove it from words.
     public void checkWords() {
-        // YOUR CODE HERE
+        for (int i = 0; i < words.size(); i++) {
+            if (!found(words.get(i))) {
+                words.remove(i);
+            }
+            else {
+                i++;
+            }
+        }
     }
+
+    public boolean found(String word) {
+        // Binary search here
+        int low = 0;
+        int high = DICTIONARY_SIZE - 1;
+
+        while (low <= high) {
+            int mid = (high + low) / 2;
+            int comparison = DICTIONARY[mid].compareTo(word);
+
+            if (comparison == 0) {
+                return true;
+            }
+            else if (comparison < 0) {
+                low = mid + 1;
+            }
+            else {
+                high = mid - 1;
+            }
+
+        }
+        return false;
+    }
+
 
     // Prints all valid words to wordList.txt
     public void printWords() throws IOException {
